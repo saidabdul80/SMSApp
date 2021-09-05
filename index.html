@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="bootstrap.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="loading-bar.css">
+    <script src="bootstrap.js"></script>
+    <script src="loading-bar.js"></script>    
+    <script src="axios.js"></script>
+    <script src="vue.js"></script>
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="cont" id="app">
+        <div v-if="processing" style="background-color: #f1f2f3dd;position: fixed; top: 0px;left: 0px; width: 100%; min-height: 100vh; z-index: 10000;display: flex; justify-content: center;flex-wrap: wrap; align-items: center; ">                        
+            <span>
+                <img src="loader.svg" alt=""><br>
+                <p class="text-center">..Please Wait</p>
+            </span>
+        </div>
+        <div class="cont1" style="position: relative;">
+            <div style="position: absolute;left: 35%; top: 40%;">
+                <button class="btn btn-info text-white">Upload JSON data</button>
+            </div>
+            <textarea name="" id="jsonData" v-model="jsondata" :placeholder="JSON.stringify(alldata, null, 2)" class="form-control" cols="10" rows="10"></textarea>
+        </div>
+        <div class="cont2">
+            <h4>NATAIS SMS SYSTEM</h4>
+            <span @click="insertAtCaret('textareaid','[membership_id] ')" class=" badge bg-primary tag">membership_id</span>
+            <span @click="insertAtCaret('textareaid','[password] ')" class=" badge bg-primary tag">password</span>
+            <span @click="insertAtCaret('textareaid','[title] ')" class=" badge bg-primary tag">title</span>
+            <span @click="insertAtCaret('textareaid','[firstname] ')" class=" badge bg-primary tag">firstname</span>
+            <span @click="insertAtCaret('textareaid','[lastname] ')" class=" badge bg-primary tag">lastname</span>
+            <span @click="insertAtCaret('textareaid','[othername] ')" class=" badge bg-primary tag">othername</span>
+            <span @click="insertAtCaret('textareaid','[status] ')" class=" badge bg-primary tag">status</span>
+            <span @click="insertAtCaret('textareaid','[wing] ')" class=" badge bg-primary tag">wing</span>
+            <span @click="insertAtCaret('textareaid','[phone_no] ')" class=" badge bg-primary tag">phone_no</span>
+            <span @click="insertAtCaret('textareaid','[address] ')" class=" badge bg-primary tag">address</span>
+            <span @click="insertAtCaret('textareaid','[state] ')" class=" badge bg-primary tag">state</span>
+            <span @click="insertAtCaret('textareaid','[email] ')" class=" badge bg-primary tag">email</span>
+            <span @click="insertAtCaret('textareaid','[year_entry] ')" class=" badge bg-primary tag">year_entry</span>
+            <span @click="insertAtCaret('textareaid','[institution] ')" class=" badge bg-primary tag">institution</span>
+            <span @click="insertAtCaret('textareaid','[position] ')" class=" badge bg-primary tag">position</span>
+            <span @click="insertAtCaret('textareaid','[phot] ')" class=" badge bg-primary tag">phot</span>
+            <br><br>
+            <textarea name="" id="textareaid" class="form-control"  cols="20" rows="5"></textarea>
+            <input type="radio" class="" name="" v-model="type" checked value="all" title="..Coming Soon" >One to Many<br>
+            <input type="radio" class="" name="" v-model="type" value="indi" >One to One <br>
+            <input type="radio"  v-model="mode" checked="checked" value="test"  >Testing Mode<br>
+            <input type="radio"  v-model="mode" value="nontest" >Non Test Mode<br>
+            <button @click="send" class="btn bg-darkblue mb-2">Send</button><br>
+            <div v-if="progress">      
+                <hr>
+                <div class="d-flex">
+                    <h6 class="px-3">Sent: <span class="fs1 text-success "> {{results.success.length}} </span></h6>
+                    <h6>failed: <span class="fs1 text-danger "> {{results.failed.length}} </span></h6>
+                </div>          
+                    <div style="display: flex;">
+                        <span class="w-100">
+                            <label for="">Sucessfull</label><br>
+                            <textarea class="form-control" name=""  cols="2" rows="3"></textarea>
+                        </span>
+                        <span class="w-100">
+                            <label for="">Failed</label>  <br>
+                            <textarea name="" class="form-control"  cols="2" rows="3">{{ JSON.stringify(results.success) }}</textarea>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>            
+    <script>        
+        var app = new Vue({
+                    el: '#app',
+                    data: {
+                        alldata: [
+                            {"id":"353","membership_id":"NATAIS\/NIG\/T\/353","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"ABUBAKAR KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08132366857","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},
+                            {"id":"353","membership_id":"NATAIS\/NIG\/T\/354","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"Said KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08065291757","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},    
+                            {"id":"353","membership_id":"NATAIS\/NIG\/T\/354","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"Musa KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08032346198","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},    
+                            {"id":"353","membership_id":"NATAIS\/NIG\/T\/353","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"ABUBAKAR KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08132366857","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},
+                            {"id":"353","membership_id":"NATAIS\/NIG\/T\/354","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"Said KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08065291757","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},    
+                            {"id":"353","membership_id":"NATAIS\/NIG\/T\/354","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"Musa KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08096642065","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},            
+                        ],
+                        progress:false,
+                        type:'all',
+                        total:0,
+                        count:0,
+                        percent:0,
+                        message: 'Hello Vue!',
+                        inValidPhone:[],
+                        mode:"test",
+                        phoneNumbers : [],
+                        messages : [],
+                        options:{
+                            headers: {
+                                'AJAX-ACTION': "saveDoctorManagementData"
+                            },
+                        },
+                        results:{
+                            success:[],
+                            failed:[]
+                        },
+                        jsondata:"",
+                        processing:false,
+                    },
+                    methods:{
+                        insertAtCaret(areaId, text) {
+                            var txtarea = document.getElementById(areaId);
+                            if (!txtarea) {
+                                return;
+                            }
+
+                            var scrollPos = txtarea.scrollTop;
+                            var strPos = 0;
+                            var br = ((txtarea.selectionStart || txtarea.selectionStart == '0') ?
+                                "ff" : (document.selection ? "ie" : false));
+                            if (br == "ie") {
+                                txtarea.focus();
+                                var range = document.selection.createRange();
+                                range.moveStart('character', -txtarea.value.length);
+                                strPos = range.text.length;
+                            } else if (br == "ff") {
+                                strPos = txtarea.selectionStart;
+                            }
+
+                            var front = (txtarea.value).substring(0, strPos);
+                            var back = (txtarea.value).substring(strPos, txtarea.value.length);
+                            txtarea.value = front + text + back;
+                            strPos = strPos + text.length;
+                            if (br == "ie") {
+                                txtarea.focus();
+                                var ieRange = document.selection.createRange();
+                                ieRange.moveStart('character', -txtarea.value.length);
+                                ieRange.moveStart('character', strPos);
+                                ieRange.moveEnd('character', 0);
+                                ieRange.select();
+                            } else if (br == "ff") {
+                                txtarea.selectionStart = strPos;
+                                txtarea.selectionEnd = strPos;
+                                txtarea.focus();
+                            }
+
+                            txtarea.scrollTop = scrollPos;
+                            }
+                    ,
+                    pretty(){
+                       /*  var x = JSON.stringify(this.jsondata, null, 2);
+                        this.jsondata = x.slice(x.length).slice(0).trim();   */
+                    },
+                   async send(){
+                       if(document.getElementById('textareaid').value == ""){
+                           alert("message box can't be empty ");
+                           return 0;
+                       }
+                       if(document.getElementById('jsonData').value == "" && this.mode != "test"){
+                            alert('JSON DATA REQUIRED OR SELECT TESTING MODE');
+                            return 0;
+                       }
+                       axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+                                              
+                          if(this.mode== 'test'){
+                            this.alldata =  [
+                                    {"id":"353","membership_id":"NATAIS\/NIG\/T\/353","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"ABUBAKAR KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08132366857","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},
+                                    {"id":"353","membership_id":"NATAIS\/NIG\/T\/354","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"Said KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08065291757","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},    
+                                    {"id":"353","membership_id":"NATAIS\/NIG\/T\/354","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"Musa KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08032346198","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},    
+                                    {"id":"353","membership_id":"NATAIS\/NIG\/T\/353","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"ABUBAKAR KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08132366857","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},
+                                    {"id":"353","membership_id":"NATAIS\/NIG\/T\/354","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"Said KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08065291757","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},    
+                                    {"id":"353","membership_id":"NATAIS\/NIG\/T\/354","password":"$2y$10$M5c7aF9JlNe3VFyZGLhgCuXcfwnDhbONZwsaB4eSX\/Mngdu.f.6Te","title":"Dr","firstname":"Musa KAWU","lastname":"HASSAN","othername":"","status":"Member","wing":"Tertiary","phone_no":"08096642065","address":"COE QTRS BESIDE BRIGHTER SCHOO","state":"NIGER","email":"abuabakarkawu@yahoo.co.uk","year_entry":"2018","institution":"NIGER STATE COE, MINNA","position":"Member","photo":"treasurer.jpg"},            
+                                ];
+                          }else if(this.mode=='nontest'){
+                              try{
+                                  this.alldata = JSON.parse(document.getElementById('jsonData').value);
+                              }catch(err){
+                                  alert(err);
+                              }
+                          }else{
+                              alert('select send mode');
+                              return 0;
+                          }
+                        
+                            if(this.type == 'indi'){
+                                this.processing = true;
+                                var $this = this;
+                                var message = "";
+                                let phone = '', percenti;
+                                this.total = this.alldata.length;                                
+                                this.alldata.forEach(user => {                                    
+                                    message = document.getElementById('textareaid').value;                                    
+                                    message = message.replace("[membership_id]", user.membership_id);
+                                    message = message.replace("[password]", user.password);
+                                    message = message.replace("[title]", user.title);
+                                    message = message.replace("[firstname]", user.firstname);
+                                    message = message.replace("[lastname]", user.lastname);
+                                    message = message.replace("[othername]", user.othername);
+                                    message = message.replace("[status]", user.status);
+                                    message = message.replace("[wing]", user.wing);
+                                    message = message.replace("[phone_no]", user.phone_no);
+                                    message = message.replace("[address]", user.address);
+                                    message = message.replace("[state]", user.state);
+                                    message = message.replace("[email]", user.email);
+                                    message = message.replace("[year_entry]", user.year_entry);
+                                    message = message.replace("[institution]", user.institution);
+                                    message = message.replace("[position]", user.position);
+                                    message = message.replace("[phot]", user.phot);                                
+                                    if(user.phone_no[0] != 2){
+                                    while(user.phone_no.charAt(0) == '0')
+                                    {
+                                    user.phone_no = user.phone_no.substring(1);
+                                    }                                             
+                                    phone = '+234' + user.phone_no;
+                                    }else{
+                                    phone = user.phone_no;
+                                    }                                         
+                                    if(phone != ""){
+                                        $this.phoneNumbers.push(phone);
+                                        $this.messages.push(message);                                                                    
+                                        
+                                    }else{
+                                        console.log('Error: phone number empty line 875');
+                                    }
+                                  
+                                });
+                                var datax = JSON.stringify({
+                                    phones: this.phoneNumbers,
+                                    messages: this.messages,
+                                    type: this.type
+                                });
+
+                                const response = await axios.post("sendsms.php", datax , this.options)
+                                var responsx = response.data
+                                if(response.status == 200){                                                                    
+                                    $this.results = responsx
+                                    $this.progress = true;   
+                                    $this.processing = false;
+                                }else{
+                                    console.log('error');
+                                }
+                                /* $this.count++;
+                                percenti = ($this.count/$this.total) * 100;
+                                $this.percent = percenti.toFixed(0);
+                                console.log($this.percent); */
+                            }else{
+                                alert('not available');
+                            }
+                        }
+                    }
+
+                })
+    </script>
+</body>
+</html>
